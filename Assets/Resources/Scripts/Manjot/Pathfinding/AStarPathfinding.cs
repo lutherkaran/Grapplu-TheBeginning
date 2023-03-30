@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class AStarPathfinding 
+public class AStarPathfinding
 {
     public Node[,] Nodes { get; private set; }
     int width;
@@ -26,7 +26,14 @@ public class AStarPathfinding
     public List<Node> FindPath(Vector2Int startingNode, Vector2Int targetNode)
     {
         List<Node> path = new List<Node>();
-        if(RecursivePathSearch(Nodes[startingNode.x, startingNode.y], Nodes[targetNode.x, targetNode.y]))
+        if (startingNode.x < 0 || startingNode.x >= width || startingNode.y < 0 || startingNode.y >= height
+        || targetNode.x < 0 || targetNode.x >= width || targetNode.y < 0 || targetNode.y >= height)
+        {
+            Debug.Log("Starting node or target node is out of bounds");
+            return path;
+        }
+
+        if (RecursivePathSearch(Nodes[startingNode.x, startingNode.y], Nodes[targetNode.x, targetNode.y]))
         {
             Node toAdd = Nodes[targetNode.x, targetNode.y];
             while (toAdd.parent != null)
@@ -65,23 +72,23 @@ public class AStarPathfinding
             int y = allSorroundingVectors[i].y;
             if (x < 0 || x >= width || y < 0 || y >= height)
                 continue;
-            if(!(Nodes[x, y].isWalkable))
+            if (!(Nodes[x, y].isWalkable))
                 continue;
             if (Nodes[x, y].state == Node.State.Closed)
                 continue;
-            if(Nodes[x,y].state == Node.State.Untested)
+            if (Nodes[x, y].state == Node.State.Untested)
             {
                 Nodes[x, y].parent = relativeTo;
                 Nodes[x, y].state = Node.State.Open;
                 Nodes[x, y].G = MovementCost(relativeTo, Nodes[x, y]);
-                Nodes[x, y].H = Heuristoc(Nodes[x,y], target);
+                Nodes[x, y].H = Heuristoc(Nodes[x, y], target);
                 toRet.Add(Nodes[x, y]);
             }
             else if (Nodes[x, y].state == Node.State.Open)
             {
                 float simpleCost = MovementCost(relativeTo, Nodes[x, y]);
                 float candidateGvalue = simpleCost + relativeTo.G;
-                if(candidateGvalue < Nodes[x, y].G)
+                if (candidateGvalue < Nodes[x, y].G)
                 {
                     Nodes[x, y].G = candidateGvalue;
                     Nodes[x, y].parent = relativeTo;
